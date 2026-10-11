@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14b88a">
+<title>Money Manager</title>
+<style>
+:root{--bg:#f1f7f4;--card:#fff;--ink:#10302a;--mute:#6a8680;--line:#e3ece9;--acc:#14b88a;--acc2:#0b8f9c;--out:#ea580c;--red:#ef4444;--sh:0 6px 20px rgba(16,48,42,.08);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1816;--card:#16231f;--ink:#e8f3ef;--mute:#8aa59e;--line:#25362f;--acc:#2ed3a3;--acc2:#1aa8b5;--out:#fb923c;--sh:0 6px 20px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--bg:#0e1816;--card:#16231f;--ink:#e8f3ef;--mute:#8aa59e;--line:#25362f;--acc:#2ed3a3;--acc2:#1aa8b5;--out:#fb923c;--sh:0 6px 20px rgba(0,0,0,.35)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums}
+main{max-width:600px;margin:0 auto;padding:12px 14px 120px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-.3px}.top small{color:var(--mute);display:block;font-size:13px}
+h2{font-size:15px;margin:0 0 12px;font-weight:700}
+.card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:var(--sh)}
+input,button{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:12px;min-width:0}
+button{cursor:pointer;transition:transform .12s}button:active{transform:scale(.95)}
+button.p{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border:0;font-weight:700}
+.ic{width:44px;height:44px;padding:0;font-size:18px;border-radius:50%;background:var(--card);box-shadow:var(--sh);border:0}
+.view{display:none}.view.on{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes in{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+.hero{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;text-align:center;padding:22px 16px;box-shadow:0 10px 26px rgba(11,143,156,.3)}
+.hero small{opacity:.9;font-size:13px}.hero b{display:block;font-size:42px;font-weight:800;margin:2px 0;letter-spacing:-1px}.hero p{margin:0;font-size:14px;opacity:.95}
+.g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.g small{color:var(--mute);display:block;font-size:12px}.g b{font-size:17px;font-weight:800;word-break:break-word}.g2{grid-template-columns:1fr 1fr}
+.bar{height:12px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 10px}.bar i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .8s cubic-bezier(.2,.8,.2,1)}.bar.over i{background:var(--red)}
+.st{display:flex;justify-content:space-between;font-weight:600;font-size:14px;gap:8px}.msg{font-weight:700;margin-bottom:2px}
+.cat{display:flex;justify-content:space-between;font-size:14px}.cb{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:4px 0 12px}.cb i{display:block;height:100%;width:0;border-radius:4px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.tx{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);animation:in .3s ease both}.tx:first-child{border-top:0}
+.ci{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:21px;flex:none}
+.tx .m{flex:1;min-width:0}.tx .m div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}.tx small{color:var(--mute)}
+.amt{font-weight:800}.amt.e{color:var(--out)}.amt.i{color:var(--acc)}
+.x{border:0;background:none;color:var(--mute);padding:8px 10px}
+.dh{display:flex;justify-content:space-between;margin:0 0 4px;font-size:14px}.dh span{color:var(--out);font-weight:800;font-size:15px}
+.empty{color:var(--mute);text-align:center;padding:18px 0}.empty b{display:block;font-size:34px;margin-bottom:4px}
+.mn{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-weight:700;font-size:17px}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);box-shadow:0 -4px 20px rgba(16,48,42,.1);border-radius:22px 22px 0 0;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
+.tabs button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--mute);padding:6px}.tabs button span{font-size:21px;filter:grayscale(1);opacity:.7;transition:.2s}
+.tabs button.on{color:var(--acc);font-weight:800}.tabs button.on span{filter:none;opacity:1;transform:translateY(-2px)}
+.tabs .add span{background:linear-gradient(135deg,var(--acc),var(--acc2));filter:none;opacity:1;color:#fff;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;margin-top:-26px;box-shadow:0 6px 16px rgba(11,143,156,.45)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,0);display:flex;align-items:flex-end;z-index:10;pointer-events:none;transition:background .3s}.ov.on{background:rgba(0,0,0,.5);pointer-events:auto}
+.sh{background:var(--card);width:100%;max-width:600px;margin:0 auto;border-radius:26px 26px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));transform:translateY(105%);transition:transform .4s cubic-bezier(.2,.9,.3,1.1)}.ov.on .sh{transform:none}
+.seg{display:flex;gap:8px;margin-bottom:10px}.seg button{flex:1}.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dl{text-align:center;color:var(--mute);font-size:13px;margin-bottom:6px;font-weight:600}
+#amt{font-size:32px;font-weight:800;text-align:center;width:100%;margin-bottom:8px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;font-size:14px}.chip.on{font-weight:700}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px;font-weight:600}
+.set input{width:100%}.set button{width:100%;margin-top:8px}.danger{color:var(--red)}
+.note{color:var(--mute);font-size:13px}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 14px);transform:translate(-50%,-20px);opacity:0;transition:.3s;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;z-index:20;pointer-events:none;font-weight:600;white-space:nowrap}#toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><div><h1>Money Manager</h1><small id="hello"></small></div><button class="ic" id="gear" aria-label="Settings">⚙️</button></div>
+
+<section class="view on" id="v-home">
+  <div class="card hero"><small>Spent today</small><b id="tdv">0</b><p id="tdm"></p></div>
+  <div class="card"><h2>Monthly budget</h2><div id="hb"></div></div>
+  <div class="card"><h2>Today's items</h2><div id="hl"></div></div>
+</section>
+
+<section class="view" id="v-hist">
+  <div class="mn"><button class="ic mp" aria-label="Previous month">‹</button><span class="ml"></span><button class="ic mnx" aria-label="Next month">›</button></div>
+  <div id="hh"></div>
+</section>
+
+<section class="view" id="v-sum">
+  <div class="mn"><button class="ic mp" aria-label="Previous month">‹</button><span class="ml"></span><button class="ic mnx" aria-label="Next month">›</button></div>
+  <div class="card g"><div><small>💼 Income</small><b id="sIn" style="color:var(--acc)"></b></div><div><small>🛍️ Spent</small><b id="sOut" style="color:var(--out)"></b></div><div><small>🐷 Saved</small><b id="sSv"></b></div></div>
+  <div class="card"><h2>Budget</h2><div id="sb"></div></div>
+  <div class="card g g2"><div><small>Daily average</small><b id="avg"></b></div><div><small>Highest day</small><b id="hi"></b></div></div>
+  <div class="card"><h2>Where it went</h2><div id="sc"></div></div>
+</section>
+
+<section class="view set" id="v-set">
+  <div class="card">
+    <h2>Budget for <span id="bm"></span></h2>
+    <input id="bud" type="number" inputmode="decimal" min="0" placeholder="Monthly budget">
+    <label for="cur">Currency symbol</label>
+    <input id="cur" maxlength="4">
+  </div>
+  <div class="card">
+    <h2>Backup</h2>
+    <p class="note">Your data is saved only on this phone. Export a backup now and then, and use Import to restore it or move to a new phone.</p>
+    <button id="exp" type="button">Export backup</button>
+    <button id="imp" type="button">Import backup</button>
+    <input id="file" type="file" accept=".json,application/json" hidden>
+    <p class="note" id="msg"></p>
+  </div>
+  <div class="card"><button id="wipe" class="danger" type="button" style="margin:0;width:100%">Delete all data</button></div>
+</section>
+</main>
+
+<nav class="tabs">
+  <button data-v="home" class="on"><span>🏠</span>Home</button>
+  <button data-v="hist"><span>📅</span>History</button>
+  <button class="add" id="addb" aria-label="Add"><span>＋</span></button>
+  <button data-v="sum"><span>📊</span>Summary</button>
+</nav>
+
+<div class="ov" id="ov"><div class="sh">
+  <div class="seg"><button id="tE" class="on" type="button">Expense</button><button id="tI" type="button">Income</button></div>
+  <div class="dl" id="dl"></div>
+  <input id="amt" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0">
+  <div class="chips" id="chips"></div>
+  <div class="f"><input id="date" type="date" aria-label="Date"><input id="note" placeholder="Note (optional)"></div>
+  <div class="seg"><button id="more" type="button">Save &amp; add another</button><button id="save" class="p" type="button">Save</button></div>
+</div></div>
+<div id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const CAT={Food:["🍔","#f97316"],Transport:["🚌","#3b82f6"],Charity:["🤲","#ec4899"],Bills:["💡","#eab308"],Shopping:["🛍️","#a855f7"],Health:["💊","#ef4444"],Rent:["🏠","#14b8a6"],Entertainment:["🎬","#6366f1"],Education:["📚","#0ea5e9"],Other:["🧾","#94a3b8"],Salary:["💼","#16a34a"],Business:["🏪","#0d9488"],Gift:["🎁","#f43f5e"]};
+const CATS={e:["Food","Transport","Charity","Bills","Shopping","Health","Rent","Entertainment","Education","Other"],i:["Salary","Business","Gift","Other"]};
+const tdy=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+let D={tx:[],bud:{},cur:"৳"},view="home",type="e",cat="Food",m=tdy().slice(0,7),useDate=tdy();
+try{const s=JSON.parse(localStorage.getItem("mm_data")||"null");if(s&&Array.isArray(s.tx))D={tx:s.tx,bud:s.bud||{},cur:s.cur||"৳"}}catch(e){}
+const save=()=>{try{localStorage.setItem("mm_data",JSON.stringify(D))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money=n=>D.cur+(Math.round(n*100)/100).toLocaleString(undefined,{maximumFractionDigits:2});
+const mname=k=>new Date(k+"-01T00:00").toLocaleDateString(undefined,{month:"long",year:"numeric"});
+const dname=d=>new Date(d+"T00:00").toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
+const sum=(a,t)=>a.filter(x=>x.type===t).reduce((s,x)=>s+x.amount,0);
+const ce=c=>(CAT[c]||CAT.Other)[0],cc=c=>(CAT[c]||CAT.Other)[1];
+let tt;const toast=t=>{const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("on"),1800)};
+
+const pv={};
+function num(id,v){const el=$(id),f=pv[id]??0;pv[id]=v;if(f===v){el.textContent=money(v);return}
+  const t0=performance.now(),st=t=>{const p=Math.min(1,(t-t0)/700),e=1-Math.pow(1-p,3);el.textContent=money(f+(v-f)*e);if(p<1)requestAnimationFrame(st)};requestAnimationFrame(st)}
+
+function stats(mo){
+  const list=D.tx.filter(t=>t.date.startsWith(mo)).sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+  const dt={},by={};list.filter(t=>t.type==="e").forEach(t=>{dt[t.date]=(dt[t.date]||0)+t.amount;by[t.category]=(by[t.category]||0)+t.amount});
+  return{list,inc:sum(list,"i"),out:sum(list,"e"),dt,by};
+}
+function budHTML(mo,out){
+  const b=D.bud[mo]||0,past=mo<tdy().slice(0,7);
+  if(!b)return'<div class="empty"><b>🎯</b>Set a monthly budget in ⚙️ to track your spending</div>';
+  const p=Math.round(out/b*100),o=out>b;
+  const msg=o?`Over budget by ${money(out-b)} 😬`:past?"You finished under budget! 🎉":p<50?"You're doing great 🎉":p<80?"On track 👍":`Careful, ${p}% used ⚠️`;
+  return`<div class="msg" style="${o?"color:var(--red)":""}">${msg}</div><div class="bar${o?" over":""}"><i data-w="${Math.min(100,p)}"></i></div><div class="st"><span>${o?"Extra: "+money(out-b):"Left: "+money(b-out)}</span><span>${p}% of ${money(b)}</span></div>`;
+}
+const row=t=>`<div class="tx"><div class="ci" style="background:${cc(t.category)}26">${ce(t.category)}</div><div class="m"><div>${esc(t.note||t.category)}</div><small>${esc(t.category)}</small></div><span class="amt ${t.type}">${t.type==="e"?"−":"+"}${money(t.amount)}</span><button class="x" data-id="${t.id}" aria-label="Delete">✕</button></div>`;
+
+function render(){
+  const td=tdy(),cm=td.slice(0,7),cs=stats(cm),h=new Date().getHours();
+  $("hello").textContent=(h<12?"Good morning ☀️":h<18?"Good afternoon 🌤️":"Good evening 🌙")+" · "+dname(td);
+  const tl=D.tx.filter(t=>t.date===td).sort((a,b)=>b.id.localeCompare(a.id)),ts=sum(tl,"e");
+  num("tdv",ts);
+  $("tdm").textContent=ts===0?"Nothing spent yet today ✨":tl.length+(tl.length>1?" items":" item")+" today";
+  $("hb").innerHTML=budHTML(cm,cs.out);
+  $("hl").innerHTML=tl.length?tl.map(row).join(""):'<div class="empty"><b>🌱</b>Nothing yet today. Tap ＋ to add.</div>';
+  document.querySelectorAll(".ml").forEach(e=>e.textContent=mname(m));
+  const s=stats(m),days={};s.list.forEach(t=>(days[t.date]=days[t.date]||[]).push(t));
+  $("hh").innerHTML=s.list.length?Object.keys(days).map(d=>`<div class="card"><div class="dh"><b>${dname(d)}</b><span>${s.dt[d]?money(s.dt[d]):""}</span></div>${days[d].map(row).join("")}</div>`).join(""):'<div class="empty"><b>📭</b>No entries this month</div>';
+  num("sIn",s.inc);num("sOut",s.out);num("sSv",s.inc-s.out);
+  $("sb").innerHTML=budHTML(m,s.out);
+  const[y,mo]=m.split("-").map(Number),n=new Date(),dim=new Date(y,mo,0).getDate(),el=(y===n.getFullYear()&&mo===n.getMonth()+1)?n.getDate():dim;
+  num("avg",s.out/el);
+  const ks=Object.keys(s.dt);
+  $("hi").textContent=ks.length?(()=>{const k=ks.reduce((a,b)=>s.dt[b]>s.dt[a]?b:a);return money(s.dt[k])+" · "+new Date(k+"T00:00").toLocaleDateString(undefined,{day:"numeric",month:"short"})})():"—";
+  const rs=Object.entries(s.by).sort((a,b)=>b[1]-a[1]);
+  $("sc").innerHTML=rs.length?rs.map(([c,v])=>`<div class="cat"><span>${ce(c)} ${esc(c)}</span><span>${money(v)} · ${Math.round(v/s.out*100)}%</span></div><div class="cb"><i data-w="${v/s.out*100}" style="background:${cc(c)}"></i></div>`).join(""):'<div class="empty"><b>🪙</b>No spending this month</div>';
+  $("bm").textContent=mname(cm);
+  if(document.activeElement!==$("bud"))$("bud").value=D.bud[cm]||"";
+  if(document.activeElement!==$("cur"))$("cur").value=D.cur;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll("[data-w]").forEach(e=>e.style.width=e.dataset.w+"%")));
+}
+function go(v){
+  view=v;document.querySelectorAll(".view").forEach(e=>e.classList.toggle("on",e.id==="v-"+v));
+  document.querySelectorAll(".tabs [data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  window.scrollTo(0,0);render();
+}
+document.querySelectorAll(".tabs [data-v]").forEach(b=>b.onclick=()=>go(b.dataset.v));
+$("gear").onclick=()=>go(view==="set"?"home":"set");
+const shift=n=>{const[y,mo]=m.split("-").map(Number),d=new Date(y,mo-1+n,1);m=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");render()};
+document.querySelectorAll(".mp").forEach(b=>b.onclick=()=>shift(-1));
+document.querySelectorAll(".mnx").forEach(b=>b.onclick=()=>shift(1));
+
+function chips(){$("chips").innerHTML=CATS[type].map(c=>{const on=c===cat,k=cc(c);return`<button type="button" class="chip${on?" on":""}" data-c="${c}" style="border-color:${on?k:"var(--line)"};background:${on?k+"26":"var(--bg)"}">${ce(c)} ${c}</button>`}).join("")}
+$("chips").onclick=e=>{const b=e.target.closest(".chip");if(b){cat=b.dataset.c;chips()}};
+function setType(t){type=t;cat=CATS[t][0];$("tE").className=t==="e"?"on":"";$("tI").className=t==="i"?"on":"";chips()}
+function dlab(){const d=$("date").value||tdy();$("dl").textContent="Adding to: "+(d===tdy()?"Today, ":"")+dname(d)}
+$("tE").onclick=()=>setType("e");$("tI").onclick=()=>setType("i");
+$("date").onchange=()=>{useDate=$("date").value||tdy();dlab()};
+$("addb").onclick=()=>{setType(type);$("date").value=useDate;dlab();$("amt").value="";$("note").value="";$("ov").classList.add("on");setTimeout(()=>$("amt").focus(),350)};
+$("ov").onclick=e=>{if(e.target===$("ov"))$("ov").classList.remove("on")};
+function add(keepOpen){
+  const a=parseFloat($("amt").value);if(!(a>0)){$("amt").focus();return}
+  const d=$("date").value||tdy();useDate=d;
+  D.tx.push({id:"t"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),type,amount:a,category:cat,date:d,note:$("note").value.trim()});
+  save();render();
+  if(keepOpen){$("amt").value="";$("note").value="";$("amt").focus();toast("Saved ✅ Add the next one")}
+  else{$("ov").classList.remove("on");toast("Saved ✅")}
+}
+$("save").onclick=()=>add(false);$("more").onclick=()=>add(true);
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".x");if(!b)return;
+  if(b.dataset.sure){D.tx=D.tx.filter(t=>t.id!==b.dataset.id);save();render()}
+  else{b.dataset.sure="1";b.textContent="Delete?";b.style.color="var(--red)";setTimeout(()=>{b.dataset.sure="";b.textContent="✕";b.style.color=""},3000)}
+});
+$("bud").onchange=()=>{D.bud[tdy().slice(0,7)]=parseFloat($("bud").value)||0;save();render()};
+$("cur").oninput=()=>{D.cur=$("cur").value||"৳";save();render()};
+$("exp").onclick=async()=>{
+  const json=JSON.stringify({app:"money-manager",v:1,...D}),name="money-manager-"+tdy()+".json",P=window.Capacitor&&Capacitor.Plugins;
+  try{
+    if(P&&P.Filesystem&&P.Share){
+      const r=await P.Filesystem.writeFile({path:name,data:json,directory:"CACHE",encoding:"utf8"});
+      await P.Share.share({title:"Money Manager backup",url:r.uri,dialogTitle:"Save or send your backup"});
+      $("msg").textContent="Backup ready. Choose where to save it (Drive, WhatsApp, Files...).";
+    }else{
+      const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([json],{type:"application/json"}));
+      a.download=name;document.body.appendChild(a);a.click();a.remove();$("msg").textContent="Backup downloaded.";
+    }
+  }catch(e){$("msg").textContent="Could not export: "+(e&&e.message?e.message:"cancelled")}
+};
+$("imp").onclick=()=>$("file").click();
+$("file").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const j=JSON.parse(r.result);if(!Array.isArray(j.tx))throw 0;
+    const ids=new Set(D.tx.map(t=>t.id));j.tx.forEach(t=>{if(t&&t.id&&t.date&&t.amount>0&&!ids.has(t.id))D.tx.push(t)});
+    Object.assign(D.bud,j.bud||{});save();render();$("msg").textContent="Imported "+j.tx.length+" entries."}catch(x){$("msg").textContent="That file isn't a valid backup."}};
+  r.readAsText(f);e.target.value="";
+};
+$("wipe").onclick=()=>{
+  const b=$("wipe");
+  if(!b.dataset.sure){b.dataset.sure="1";b.textContent="Tap again to delete EVERYTHING";setTimeout(()=>{b.dataset.sure="";b.textContent="Delete all data"},4000);return}
+  D.tx=[];D.bud={};save();b.dataset.sure="";b.textContent="All data deleted";setTimeout(()=>b.textContent="Delete all data",2500);render();
+};
+chips();render();
+</script>
+</body>
+</html>
